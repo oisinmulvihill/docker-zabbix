@@ -1,6 +1,26 @@
 Docker Zabbix
 ========================
 
+## Oisin's Changes
+
+A slight interruption is needed...
+
+I've created a "/logs" directory you can use from your externalscripts and other
+scripts to aid development and debugging them. To have access on the host machine
+you would need to use the -v option e.g. -v /tmp:/logs.
+
+The zabbix server and agent on docker will now put their logs in /logs directory
+which helps debugging.
+
+My docker image is built as:
+
+```
+    sudo docker build -t oisinmulvihill/docker-zabbix .
+
+```
+
+And now, back to your normal program...
+
 ## Container
 
 The container provides the following *Zabbix Services*, please refer to the [Zabbix documentation](http://www.zabbix.com/) for additional info.

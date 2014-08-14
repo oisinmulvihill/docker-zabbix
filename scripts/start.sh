@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ ! -f /mysql-configured ]; then 
- 	/sbin/service mysqld restart 
+if [ ! -f /mysql-configured ]; then
+ 	/sbin/service mysqld restart
 
  	/usr/bin/mysql_upgrade
 
@@ -13,7 +13,7 @@ if [ ! -f /mysql-configured ]; then
 
 	 echo "$MYSQL_PASSWORD" > /mysql-root-pw.txt
 
-	 mysqladmin -uroot password $MYSQL_PASSWORD 
+	 mysqladmin -uroot password $MYSQL_PASSWORD
 
 	 mysql -uroot -p"$MYSQL_PASSWORD" -e "INSERT INTO mysql.user (Host,User,Password) VALUES('%','admin',PASSWORD('${MYSQL_PASSWORD}'));"
 
@@ -39,5 +39,8 @@ if [ ! -f /mysql-configured ]; then
 fi
 
 passwd -d root
+
+chmod 755 /logs
+chown -R zabbix: /logs
 
 /usr/bin/monit -d 10 -Ic /etc/monitrc

@@ -44,6 +44,8 @@ RUN chown root:zabbix /etc/zabbix/zabbix_server.conf
 # Monit
 ADD ./monitrc /etc/monitrc
 RUN chmod 600 /etc/monitrc
+# Sometimes monitor would start as the file wasn't always owned by root. This
+# fixed this out of the box.
 RUN chown root /etc/monitrc
 
 # https://github.com/dotcloud/docker/issues/1240#issuecomment-21807183
@@ -59,5 +61,10 @@ RUN chmod 755 /start.sh
 # * Monit
 EXPOSE 10051 10052 80 2812
 
-VOLUME ["/var/lib/mysql", "/usr/lib/zabbix/alertscripts", "/usr/lib/zabbix/externalscripts", "/etc/zabbix/zabbix_agentd.d"]
+# Make a directory scripts (alert, externalchecks, etc could use)
+RUN mkdir /logs
+RUN chmod 775 /logs
+RUN chown -R zabbix: /logs
+
+VOLUME ["/var/lib/mysql", "/usr/lib/zabbix/alertscripts", "/usr/lib/zabbix/externalscripts", "/etc/zabbix/zabbix_agentd.d", "/logs"]
 CMD ["/bin/bash", "/start.sh"]
