@@ -1,32 +1,6 @@
 Docker Zabbix
 ========================
 
-## Oisin's Changes
-
-I've added SSHd access if you expose TCP port 22. The login username is "admin"
-and the password is "adminaccess". To access the service you would do:
-
-```
-    # Assuming 22 is mapped to 2022 e.g. -p 2022:22 in the docker image run.
-    # From the host machine:
-    ssh -P admin@localhost 2022
-
-    # The admin user has sudo rights.
-
-```
-
-I've created a "/logs" directory you can use from your externalscripts and other
-scripts to aid development and debugging them. To have access on the host machine
-you would need to use the -v option e.g. -v /tmp:/logs.
-
-My docker image is built as:
-
-```
-    sudo docker build -t oisinmulvihill/zabbix .
-
-```
-
-
 ## Container
 
 The container provides the following *Zabbix Services*, please refer to the [Zabbix documentation](http://www.zabbix.com/) for additional info.
