@@ -12,10 +12,52 @@ you would need to use the -v option e.g. -v /tmp:/logs.
 The zabbix server and agent on docker will now put their logs in /logs directory
 which helps debugging.
 
-My docker image is built as:
+### my quick build and run reference
+
+#### Build
+
+I build this docker image locally (from the checkout directory):
 
 ```
     sudo docker build -t oisinmulvihill/docker-zabbix .
+```
+
+#### Set up mount points
+
+This is once off set up on my vagrant box. I'm using my own set up for this.
+
+E.g. docker box from https://github.com/oisinmulvihill/handy-setups
+
+```
+
+    sudo mkdir -p /var/lib/zabbix/mysql
+    sudo mkdir -p /var/lib/zabbix/alertscripts
+    sudo mkdir -p /var/lib/zabbix/externalscripts
+    sudo mkdir -p /var/lib/zabbix/zabbix_agentd.d
+    sudo mkdir -p /var/lib/zabbix/logs
+
+    sudo chown -R vagrant: /var/lib/zabbix
+
+```
+
+#### Run interactively
+
+I forward the ports and mount the volumes for testing purposes as:
+
+```
+
+    sudo docker run -i -t \
+        -v /var/lib/zabbix/mysql:/var/lib/mysql \
+        -v /var/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts \
+        -v /var/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts \
+        -v /var/lib/zabbix/logs:/logs \
+        -v /etc/zabbix/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d \
+        -p 10051:10051 \
+        -p 10052:10052 \
+        -p 2080:80 \
+        -p 2022:22 \
+        -p 2812:2812 \
+        oisinmulvihill/zabbix
 
 ```
 
