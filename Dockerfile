@@ -1,5 +1,11 @@
 FROM centos:centos6
-MAINTAINER Bernardo Gomez Palacio <bernardo.gomezpalacio@gmail.com>
+# Based on Bernardo Gomez Palacio <bernardo.gomezpalacio@gmail.com> work to add
+# some useful items I like to have.
+#
+# Original:
+# 	* https://github.com/berngp/docker-zabbix
+#
+MAINTAINER Oisin Mulvihill <oisin.mulvihill@gmail.com>
 
 # Update base images.
 RUN yum distribution-synchronization -y
@@ -26,8 +32,29 @@ RUN yum -y -q install zabbix-agent zabbix-get zabbix-java-gateway zabbix-sender 
 RUN yum -y -q install zabbix22-dbfiles-mysql
 # install monit
 RUN yum -y -q install monit
+# Get the mkpasswd utility i use later:
+# Reference:
+#  * http://pikedom.com/?p=74
+#
+RUN yum -y install expect
+# SSHd to aid debugging if exposed.
+# Reference:
+#    http://www.cyberciti.biz/faq/centos-ssh/
+#
+RUN yum -y -q install openssh-server openssh-clients
+# enable the service and run it
+RUN chkconfig sshd on
+RUN service sshd start
+#-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+
 # Cleaining up.
 RUN yum clean all
+# helper tools for python
+RUN yum -y -q install python-pip
+# Requests in externalscripts really helps make web scripts much simpler.
+# Reference:
+#  * http://www.cyberciti.biz/faq/debian-ubuntu-centos-rhel-linux-install-pipclient/
+RUN pip install requests
 # MySQL
 ADD ./mysql/my.cnf /etc/mysql/conf.d/my.cnf
 # Zabbix Conf Files
@@ -56,7 +83,19 @@ RUN chmod 755 /start.sh
 # * Zabbix services
 # * Apache with Zabbix UI
 # * Monit
-EXPOSE 10051 10052 80 2812
+EXPOSE 10051 10052 80 22 2812
 
-VOLUME ["/var/lib/mysql", "/usr/lib/zabbix/alertscripts", "/usr/lib/zabbix/externalscripts", "/etc/zabbix/zabbix_agentd.d"]
+# Make a directory scripts (alert, externalchecks, etc could use)
+RUN mkdir /logs
+
+# Add a user to aid problem diagnosis if SSHd is exposed.
+RUN groupadd admin
+RUN useradd -g admin -g admin -s /bin/bash -m -d /home/admin admin
+# shinken is the password for shinken user to aid debugging issues over ssh.
+RUN usermod -p $(mkpasswd -H md5 adminaccess) admin
+# Generate ssh keys
+RUN su - admin -c 'ssh-keygen -q -f /home/admin/.ssh/id_rsa -N ""'
+
+
+VOLUME ["/var/lib/mysql", "/usr/lib/zabbix/alertscripts", "/usr/lib/zabbix/externalscripts", "/etc/zabbix/zabbix_agentd.d", "/logs"]
 CMD ["/bin/bash", "/start.sh"]
