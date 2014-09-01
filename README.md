@@ -61,6 +61,9 @@ I forward the ports and mount the volumes for testing purposes as:
 
 ```
 
+My version of this is available on the docker repository here
+* https://registry.hub.docker.com/u/oisinmulvihill/docker-zabbix/
+
 And now, back to your normal program...
 
 ## Container
